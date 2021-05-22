@@ -1,0 +1,95 @@
+with(StringTools):
+with(LinearAlgebra):
+
+# path_full_in := "D:/Dropbox/!lll/lll/t1.txt":
+# path_full_in := "D:/Dropbox/!lll/lll/t2.txt":
+# path_full_in := "D:/Dropbox/!lll/lll/t3.txt":
+path_full_in := "D:/Dropbox/!lll/lll/t4.txt":
+# path_full_in := "D:/Dropbox/!lll/lll/t5.txt":
+f_in := fopen(path_full_in, 'READ', 'TEXT'):
+
+n := parse(readline(f_in)):
+v := Matrix(n):
+
+i := 1:
+while not feof(f_in) do
+	line := StringSplit(readline(f_in), ", "):
+	line[1] := SubstituteAll(line[1], "[", ""):
+	line[n] := SubstituteAll(line[n], "],", ""):
+	line[n] := SubstituteAll(line[n], "]", ""):
+	for j from 1 to n do
+		v[i, j] := parse(line[j]):
+	end do:
+	i := i + 1:
+end do:
+fclose(f_in):
+v_init := copy(v):
+
+const := 0.75:
+k := 2:
+max_k := k:
+step := 0:
+cnt_red, cnt_swap := 0, 0:
+flag_red, flag_swap := false, false:
+
+vs := copy(v):
+
+gs := proc(t::integer)
+	global v, vs:
+	local i, j, mu:
+	for i from 1 to t do
+		vs[i] := v[i]:
+		for j from 1 to i - 1 do
+			mu := convert(DotProduct(v[i], vs[j]) / DotProduct(vs[j], vs[j]), float):
+			vs[i] := vs[i] - mu * vs[j]:
+		end do:
+	end do:
+end proc:
+
+gs(n):
+
+while k <= n do
+	step := step + 1:
+	printf("Step %d, k: %d/%d", step, k, max_k):
+
+	if flag_swap then
+		gs(k):
+		flag_swap := false:
+	end if:
+
+	for j from k - 1 by -1 to 1 do
+		mu1 := convert(DotProduct(v[k], vs[j]) / DotProduct(vs[j], vs[j]), float):
+		mu1_rnd := round(mu1):
+		if mu1_rnd != 0 then
+			flag_red := true:
+			v[k] := v[k] - mu1_rnd * v[j]:
+		end if:
+	end do:
+
+	if flag_red then
+		cnt_red := cnt_red + 1:
+		gs(k):
+		print("red\n", v):
+	end if:
+
+	mu2 := convert(DotProduct(v[k], vs[k-1]) / DotProduct(vs[k-1], vs[k-1]), float):
+	lov := convert(DotProduct(v[k], vs[k]) - (const - mu2 ** 2) * DotProduct(v[k-1], vs[k-1]), float):
+	if lov >= 0 then
+		flag_swap := false:
+		k := k + 1:
+		max_k := k:
+	else
+		cnt_swap := cnt_swap + 1:
+		flag_swap := true:
+		v[k-1], v[k] := v[k], v[k-1]:
+		k := max(k-1, 2):
+		max_k := k:
+	end if:
+
+	if flag_swap then
+		print("swap\n", v):
+	end if:
+end do:
+
+print(v):
+printf("red: %d, swap: %d", cnt_red, cnt_swap):
