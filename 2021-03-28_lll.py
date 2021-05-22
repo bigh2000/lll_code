@@ -8,6 +8,7 @@ import os
 # path_full_in = os.path.join('.', 't3.txt')
 path_full_in = os.path.join('.', 't4.txt')
 # path_full_in = os.path.join('.', 't5.txt')
+path_full_in = os.path.join('.', '1606_09320_Basis_of_KL_copy_2021_03_29_emb_80.txt')
 f_in = open(path_full_in, 'r')
 fname = os.path.basename(__file__).replace('.py', '')
 path_full_out = path_full_in.replace('.txt', '_{0}.txt'.format(fname))
